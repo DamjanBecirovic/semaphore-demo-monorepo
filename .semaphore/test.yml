@@ -1,0 +1,53 @@
+version: v1.0
+name: Monorepo Demo
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: "\U0001F469\U0001F3FB‍\U0001F3A8 — UI Service"
+    dependencies: []
+    run:
+      when: "change_in('/services/ui', {pipeline_file: 'ignore'}) or RUN_UI"
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cd services/ui
+          - sem-version elixir 1.9
+          - cache restore
+          - mix local.hex --force
+          - mix local.rebar --force
+          - mix deps.get
+          - mix deps.compile
+          - cache store
+
+      jobs:
+        - name: Lint
+          commands:
+            - mix credo
+        - name: Test
+          commands:
+            - mix test
+
+  - name: "\U0001F4B0 — Billing Service"
+    dependencies: []
+    run:
+      when: "change_in('/services/billing', {pipeline_file: 'ignore'}) or RUN_BILLING"
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cd services/billing
+          - sem-version go 1.14
+          - cache restore
+          - go get ./...
+          - cache store
+      jobs:
+        - name: Lint
+          commands:
+            - gofmt -l .
+
+        - name: Test
+          commands:
+            - go test ./...

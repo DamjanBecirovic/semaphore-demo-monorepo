@@ -5,72 +5,42 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: "\U0001F469\U0001F3FB‍\U0001F3A8 — UI Service"
+  - name: "Dummy block"
     dependencies: []
-    run:
-      when: "change_in('/services/ui', {exclude: '/services/ui/**/*.md'})"
     task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/ui
-          - sem-version elixir 1.9
-          - cache restore
-          - mix local.hex --force
-          - mix local.rebar --force
-          - mix deps.get
-          - mix deps.compile
-          - cache store
-
       jobs:
-        - name: Lint
+        - name: Simple job
           commands:
-            - mix credo
-        - name: Test
-          commands:
-            - mix test
+            - echo 123
 
-  - name: "\U0001F64E — User Service"
-    dependencies: []
-    run:
-      when: "change_in('/services/users', {exclude: '/services/users/**/*.md'})"
-    task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/users
-          - sem-version ruby 2.5
-          - cache restore
-          - bundle install
-          - cache store
-
-      jobs:
-        - name: Lint
-          commands:
-            - bundle exec rubocop
-
-        - name: Test
-          commands:
-            - bundle exec ruby test.rb
-
-  - name: "\U0001F4B0 — Billing Service"
-    dependencies: []
-    run:
-      when: "change_in('/services/billing', {exclude: '/services/billing/**/*.md'})"
-    task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/billing
-          - sem-version go 1.14
-          - cache restore
-          - go get ./...
-          - cache store
-      jobs:
-        - name: Lint
-          commands:
-            - gofmt -l .
-
-        - name: Test
-          commands:
-            - go test ./...
+promotions:
+  - name: Tests
+    pipeline_file: test.yml
+    parameters:
+      env_vars:
+        - name: RUN_UI
+          description: Run UI tests
+          required: true
+          options:
+            - 'false'
+            - 'true'
+          default_value: 'false'
+        - name: RUN_BILLING
+          description: Run Billing tests
+          required: true
+          options:
+            - 'false'
+            - 'true'
+          default_value: 'false'
+  - name: Slow Tests
+    pipeline_file: slow_test.yml
+    parameters:
+      env_vars:
+        - name: SLOW_TEST_PARAM
+          description: Slow tests param
+  - name: Debug
+    pipeline_file: debug.yml
+    parameters:
+      env_vars:
+        - name: DEBUG_PARAM
+          description: Debug param

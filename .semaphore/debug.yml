@@ -1,0 +1,14 @@
+version: v1.0
+name: Debug
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: "Dummy block"
+    dependencies: []
+    task:
+      jobs:
+        - name: Simple job
+          commands:
+            - echo $DEBUG_PARAM
