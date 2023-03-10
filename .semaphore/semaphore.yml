@@ -5,14 +5,20 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: "Dummy block"
+  - name: Dummy block
     dependencies: []
     task:
       jobs:
         - name: Simple job
           commands:
             - echo 123
-
+      agent:
+        machine:
+          type: e1-standard-2
+          os_image: ubuntu2004
+        containers:
+          - name: main
+            image: 'amazon/aws-glue-libs:glue_libs_3.0.0_image_01-amd64'
 promotions:
   - name: Tests
     pipeline_file: test.yml

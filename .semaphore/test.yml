@@ -8,7 +8,7 @@ blocks:
   - name: "\U0001F469\U0001F3FB‍\U0001F3A8 — UI Service"
     dependencies: []
     run:
-      when: "change_in('/services/ui', {pipeline_file: 'ignore'}) or RUN_UI"
+      when: 'change_in(''/services/ui'', {pipeline_file: ''ignore''}) or RUN_UI'
     task:
       prologue:
         commands:
@@ -21,7 +21,6 @@ blocks:
           - mix deps.get
           - mix deps.compile
           - cache store
-
       jobs:
         - name: Lint
           commands:
@@ -29,11 +28,10 @@ blocks:
         - name: Test
           commands:
             - mix test
-
   - name: "\U0001F4B0 — Billing Service"
     dependencies: []
     run:
-      when: "change_in('/services/billing', {pipeline_file: 'ignore'}) or RUN_BILLING"
+      when: 'change_in(''/services/billing'', {pipeline_file: ''ignore''}) or RUN_BILLING'
     task:
       prologue:
         commands:
@@ -47,7 +45,6 @@ blocks:
         - name: Lint
           commands:
             - gofmt -l .
-
         - name: Test
           commands:
             - go test ./...
